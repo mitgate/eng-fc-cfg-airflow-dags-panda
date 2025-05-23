@@ -1,0 +1,106 @@
+{
+  "1_minute_to_5_minute_max_avg": {
+    "avg": {
+      "agendamento": "*/5 * * * *",
+      "agg_param_druid": "PT1M",
+      "tag_counter": "_5m",
+      "add_minutes_to_endtime": "1",
+      "array_agg_size": 100000,
+      "base_report_interval": "1",
+      "internal_aggregation": "max",
+      "internal_agg_param_druid": "PT5M",
+      "internal_add_minutes_to_endtime": "5"
+    }
+  },
+  "5_minute_to_15_minute_avg_max": {
+    "avg": {
+      "agendamento": "*/15 * * * *",
+      "agg_param_druid": "PT5M",
+      "tag_counter": "_15m",
+      "add_minutes_to_endtime": "5",
+      "array_agg_size": 100000,
+      "base_report_interval": "1",
+      "internal_aggregation": "max",
+      "internal_agg_param_druid": "PT15M",
+      "internal_add_minutes_to_endtime": "15"
+    }
+  },
+  "second_to_1_minute": {
+    "max": {
+      "agendamento": "* * * * *",
+      "agg_param_druid": "PT1M",
+      "tag_counter": "_1m",
+      "add_minutes_to_endtime": "1",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    },
+    "sum": {
+      "agendamento": "* * * * *",
+      "agg_param_druid": "PT1M",
+      "tag_counter": "_1m",
+      "add_minutes_to_endtime": "1",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    },
+    "count": {
+      "agendamento": "* * * * *",
+      "agg_param_druid": "PT1M",
+      "tag_counter": "_1m",
+      "add_minutes_to_endtime": "1",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    }
+  },
+  "second_to_5_minute": {
+    "max": {
+      "agendamento": "*/5 * * * *",
+      "agg_param_druid": "PT5M",
+      "tag_counter": "_5m",
+      "add_minutes_to_endtime": "5",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    },
+    "sum": {
+      "agendamento": "*/5 * * * *",
+      "agg_param_druid": "PT5M",
+      "tag_counter": "_5m",
+      "add_minutes_to_endtime": "5",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    },
+    "count": {
+      "agendamento": "*/5 * * * *",
+      "agg_param_druid": "PT5M",
+      "tag_counter": "_5m",
+      "add_minutes_to_endtime": "5",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    }
+  },
+  "second_to_15_minute": {
+    "max": {
+      "agendamento": "*/15 * * * *",
+      "agg_param_druid": "PT15M",
+      "tag_counter": "_15m",
+      "add_minutes_to_endtime": "15",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    },
+    "sum": {
+      "agendamento": "*/15 * * * *",
+      "agg_param_druid": "PT15M",
+      "tag_counter": "_15m",
+      "add_minutes_to_endtime": "15",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    },
+    "count": {
+      "agendamento": "*/15 * * * *",
+      "agg_param_druid": "PT15M",
+      "tag_counter": "_15m",
+      "add_minutes_to_endtime": "15",
+      "array_agg_size": 100000,
+      "base_report_interval": "1"
+    }
+  }
+}

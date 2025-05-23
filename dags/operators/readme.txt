@@ -1,0 +1,1 @@
+Pasta com os operators utilizados nos arquivos das DAGS
