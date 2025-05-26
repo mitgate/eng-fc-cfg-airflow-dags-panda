@@ -1,3 +1,13 @@
+# Nome da DAG: z_proc_ips_panda
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para comparar dados do Netcompass com Druid
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 10 1 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 #%% v3
 from datetime import datetime, timedelta
 from airflow import DAG

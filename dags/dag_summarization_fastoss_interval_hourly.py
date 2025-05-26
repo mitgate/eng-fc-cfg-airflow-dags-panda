@@ -1,3 +1,14 @@
+# Nome da DAG: dag_summarization_fastoss_interval_hourly
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Reprocesa las agregaciones temporal de Hora para un periodo de tiempo estipulado
+# 
+# Nota: 
+# Las funciones usadas están guardadas en el archivo functions_summarization.py
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: fastoss-pm-enriched-metrics-group-30m
+# Frequência de execução (schedule): A demanda
+# Dag Activo?: No
+# Autor: CoE
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup

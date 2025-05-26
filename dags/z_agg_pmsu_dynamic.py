@@ -1,14 +1,16 @@
-# """                                                                                                                                                                       
-#    DAG: z_agg_pmsu_dynamic                                                                                                                                                   
-                                                                                                                                                                             
-#    Resumo:                                                                                                                                                                   
-#    DAG responsável por realizar agregação de contadores PMSU em múltiplos intervalos de tempo                                                                                
-#    e tipos de agregação, lendo do Druid, processando dados e enviando resultados ao Kafka.                                                                                   
-#    Ao final, atualiza variáveis do Airflow com a data da última informação processada.                                                                                       
-                                                                                                                                                                             
-#    Autor: Squad Airflow - leandro                                                                                                                                            
-#    Última atualização: 2024-05-07                                                                                                                                            
-# """                         
+# Nome da DAG: z_agg_pmsu_dynamic
+# Owner / responsável: Leandro
+# Descrição do objetivo da DAG: 
+#   DAG responsável por realizar agregação de contadores PMSU em múltiplos intervalos de tempo
+#   e tipos de agregação, lendo do Druid, processando dados e enviando resultados ao Kafka.
+#   Ao final, atualiza variáveis do Airflow com a data da última informação processada.
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: fastoss-pm-counters
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Leandro
+# Data de modificação: 2025-05-13
+
 
 # from airflow import DAG
 # from airflow.operators.python import PythonOperator
@@ -309,17 +311,6 @@
         
 #         # Registrando a DAG no namespace global
 #         globals()[dag_id] = dag 
-"""
-DAG: z_agg_pmsu_dynamic
-
-Resumo:
-DAG responsável por realizar agregação de contadores PMSU em múltiplos intervalos de tempo
-e tipos de agregação, lendo do Druid, processando dados e enviando resultados ao Kafka.
-Ao final, atualiza variáveis do Airflow com a data da última informação processada.
-
-Autor: Squad Airflow - Leandro
-Última atualização: 2025-05-13
-"""
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator

@@ -1,3 +1,13 @@
+# Nome da DAG: w_get_data_gestor
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para gerar dados agregados do Druid...
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): * * * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 #%% 4
 from airflow import DAG
 from airflow.operators.python import PythonOperator

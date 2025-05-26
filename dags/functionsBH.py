@@ -1,3 +1,12 @@
+# Nome da DAG: functionsBH
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Módulo de funciones en Python para el procesamiento de DAGs de Busy hour en el ambiente desarrollo
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow.hooks.base_hook import BaseHook
 from sqlalchemy import text
 from airflow.models import Variable

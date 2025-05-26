@@ -1,3 +1,13 @@
+# Nome da DAG: w_get_logs_druid
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para coletar os logs do Druid
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): */5 * * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # 2
 
 from airflow import DAG

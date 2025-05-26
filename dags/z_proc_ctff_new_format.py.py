@@ -1,3 +1,19 @@
+# Nome da DAG: z_proc_ctff_new_format.py
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: Faz uma requisição HTTP com lógica de retry em caso de erro.          
+#   :param url: URL para a requisição.          
+#   :param method: Método HTTP (GET, POST, etc.).
+#   :param retries: Número máximo de tentativas em caso de erro.          
+#   :param delay: Tempo (em segundos) entre as tentativas.          
+#   :param kwargs: Parâmetros adicionais para requests.request (headers, data, etc.).          
+#   :return: Resposta da requisição ou None se falhar após todas as tentativas.
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): */5 * * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator

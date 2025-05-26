@@ -1,3 +1,12 @@
+# Nome da DAG: dag_alarms_aggregation_prerequisites_dev
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Crea/modifica las tablas en Postgres para guardar las configuraciones de thresholds dev
+# Usa Druid?: No
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): Demanda
+# Dag Activo?: No
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago

@@ -1,3 +1,13 @@
+# Nome da DAG: z_proc_iptv_analytics
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: Sem descrição detalhada
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # v0.3
 from airflow import DAG
 from airflow.operators.python import PythonOperator

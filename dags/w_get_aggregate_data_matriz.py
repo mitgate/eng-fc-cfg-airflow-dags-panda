@@ -1,3 +1,13 @@
+# Nome da DAG: w_get_aggregate_data_matriz
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para gerar dados agregados do Druid(v9)
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: druid
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 import asyncio
 import aiohttp
 from airflow import DAG

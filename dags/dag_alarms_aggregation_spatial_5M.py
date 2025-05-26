@@ -1,3 +1,19 @@
+# Nome da DAG: dag_alarms_aggregation_spatial_5M
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: 
+# 1. Busca en Postgres Dev los thesholds con granularidad = 5 minutos y agregación temporal = None 
+# 2. Por cada registro de configuración de Threshold, se lanza una petición a druid adapter con el fin de obtener la consulta SQL que será ejecutada por Druid para la generación de la métrica deseada.
+# 3. Se lanza la ejecución en Druid de cada consulta SQL generada en el paso anterior.
+# 4. Envia cada fila del resultado obtenido kafka
+# Nota: 
+# Este dag es una nueva versión que consulta y consolida en un json anidado las métricas históricas de las alarmas configuradas.
+# Las funciones usadas están guardadas en el archivo functions_v2.py
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: snmp-enriched-metrics fastoss-pm-enriched-metrics
+# Frequência de execução (schedule): Cada 5 minutos
+# Dag Activo?: Si
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine

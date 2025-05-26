@@ -1,3 +1,13 @@
+# Nome da DAG: y_status_elementos
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG status elementos com cache Redis.
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: elements_status
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # V0
 
 import json

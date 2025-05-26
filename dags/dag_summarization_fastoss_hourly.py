@@ -1,3 +1,15 @@
+# Nome da DAG: dag_summarization_fastoss_hourly
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Ejecuta una tarea index_parallel en Druid para leer datos desde fastoss-pm-enriched-metrics-temporal-30m y agregarlos en fastoss-pm-enriched-metrics-temporal-hourly, consolidando métricas cada hora en el ambiente de producción (prd)
+#
+# Nota: 
+# Las funciones usadas están guardadas en el archivo functions_summarization.py
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: fastoss-pm-enriched-metrics-temporal-30m
+# Frequência de execução (schedule): Cada hora
+# Dag Activo?: Si
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.models import Variable

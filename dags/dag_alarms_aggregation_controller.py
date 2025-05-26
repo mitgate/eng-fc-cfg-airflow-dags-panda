@@ -1,3 +1,12 @@
+# Nome da DAG: dag_alarms_aggregation_controller_dev
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Busca las configuracion de los thresholds en Symphony Dev y las guarda en la base de datos Postgres de airflow
+# Usa Druid?: No
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): Demanda
+# Dag Activo?: No
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 import pandas as pd
 #import numpy as np

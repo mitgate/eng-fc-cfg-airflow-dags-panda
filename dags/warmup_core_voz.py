@@ -1,3 +1,13 @@
+# Nome da DAG: warmup_core_voz
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para filtrar dashboards contendo (VOZ) e enviar dados para aquecimento de cache
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 40 0-22/2 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator

@@ -1,3 +1,13 @@
+# Nome da DAG: z_ingestion_netcompass
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para gerar o lookup dos hls.
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 3 0 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # v2
 from airflow import DAG
 from airflow.operators.python import PythonOperator

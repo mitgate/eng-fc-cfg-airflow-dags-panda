@@ -1,3 +1,13 @@
+# Nome da DAG: warmup_core_snmp
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para filtrar dashboards contendo (5G) e enviar dados para aquecimento de cache
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 2 1-23/2 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator

@@ -1,3 +1,15 @@
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Buscar en Symphony Dev la configuración de las Busy Hour con periodicidad MES
+# Ejecutar en Druid el SQL para obtener todos los valores agregados por hora en ese periodo de tiempo.
+# Enviar a kafka 1er, 2do y 3er BH de cada kpi y dn
+# Nota: 
+# Las funciones usadas están guardadas en el archivo functionsBH_v2.py
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: snmp-enriched-metrics fastoss-pm-enriched-metrics
+# Frequência de execução (schedule): A demanda
+# Dag Activo?: No
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 import pandas as pd
 import functionsBH

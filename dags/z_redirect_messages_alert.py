@@ -1,3 +1,13 @@
+# Nome da DAG: z_redirect_messages_alert
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG redirecionar mensagens do kafka.
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): * * * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # V0
 
 import json

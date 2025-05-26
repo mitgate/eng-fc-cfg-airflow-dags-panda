@@ -1,3 +1,13 @@
+# Nome da DAG: z_send_alerts_using_email
+# Owner / responsável: Leandro
+# Descrição do objetivo da DAG: DAG para enviar alertas por e-mail 📩
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: msg
+# Frequência de execução (schedule): * * * * *
+# Dag Activo?: 
+# Autor: Leandro
+# Data de modificação: 2025-05-26
+
 #%%
 import json
 import tempfile

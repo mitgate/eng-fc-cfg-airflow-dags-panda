@@ -1,3 +1,13 @@
+# Nome da DAG: y_status_elementos_update
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para atualização de status dos elementos.
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 import logging
 from datetime import datetime, timedelta
 from airflow import DAG

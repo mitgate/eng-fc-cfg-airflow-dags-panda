@@ -1,3 +1,13 @@
+# Nome da DAG: w_dag_matriz_reproc
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: # Função para verificar arquivos faltantes no Druid def verificar_arquivos_faltantes_druid(arquivos_faltantes, vendor_name):      arquivos_realmente_faltantes = []      enderecos_faltantes = [sublista[0] for sublista in arquivos_faltantes]      arquivos_faltantes_str = "', '".join(enderecos_faltantes)           query = f'''              SELECT DISTINCT "managerFilename"              FROM "druid"."fastoss-pm-enriched-metrics"              WHERE "managerFilename" IN ('{arquivos_faltantes_str}')              AND "sourceVendor" = '{vendor_name}'              AND __time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY          '''       result = send_query_to_druid(query)      arquivos_encontrados_druid = {item['managerFilename'] for item in result}           for arquivo_faltante in arquivos_faltantes:          if arquivo_faltante[0] not in arquivos_encontrados_druid:              arquivos_realmente_faltantes.append(arquivo_faltante)       print(f"🔴 Total de arquivos realmente faltantes no Druid: {len(arquivos_realmente_faltantes)}")      return arquivos_realmente_faltantes
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: druid
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # Start v5
 from airflow import DAG
 from airflow.operators.python import PythonOperator

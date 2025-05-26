@@ -1,3 +1,13 @@
+# Nome da DAG: utils_kill_bucket
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: Deletar objetos no bucket S3
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy import DummyOperator

@@ -1,3 +1,15 @@
+# Nome da DAG: dag_summarization_snmp_group_hourly
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Ejecuta una tarea index_parallel en Druid para leer datos desde snmp-enriched-metrics-group-15m y agregarlos en snmp-enriched-metrics-group-hourly, consolidando métricas cada hora en el ambiente de producción (prd)
+#
+# Nota: 
+# Las funciones usadas están guardadas en el archivo functions_summarization.py
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: snmp-enriched-metrics-group-15m
+# Frequência de execução (schedule): Cada hora
+# Dag Activo?: Si
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.models import Variable

@@ -1,3 +1,13 @@
+# Nome da DAG: reproc_neteco_dag
+# Owner / responsável: Patrick
+# Descrição do objetivo da DAG: DAG para reprocessamento de arquivos Neteco
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: druid
+# Frequência de execução (schedule): 30 21 * * *
+# Dag Activo?: 
+# Autor: Patrick
+# Data de modificação: 2025-05-26
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from ftplib import FTP_TLS

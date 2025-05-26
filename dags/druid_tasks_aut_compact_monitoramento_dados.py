@@ -1,3 +1,16 @@
+# Nome da DAG: druid_tasks_aut_compact_monitoramento_dados
+# Owner / responsável: airflow
+# Descrição do objetivo da DAG: Retorno esperado:          
+# {
+#   'menor_data': f'{min_valid_date}',
+#   'maior_data' f'{max_valid_date}'
+# }
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: sys.segments, sys.tasks
+# Frequência de execução (schedule): 0 0 * * *
+# Dag Activo?: 
+# Autor: airflow
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago

@@ -1,3 +1,12 @@
+# Nome da DAG: dag_alarms_aggregation_spatial_intervalo_dev
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Este dag realiza el proceso de consulta y envío de metricas a kafka para un periodo establecido y una granularidad configurada.
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: snmp-enriched-metrics fastoss-pm-enriched-metrics
+# Frequência de execução (schedule): A demanda
+# Dag Activo?: No
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator

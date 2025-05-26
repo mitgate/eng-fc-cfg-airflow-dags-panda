@@ -1,3 +1,13 @@
+# Nome da DAG: z_agg_contadores_media_MAX
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para agregação de contadores.
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 1/15 * * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # v7
 from airflow import DAG
 from airflow.operators.python import PythonOperator

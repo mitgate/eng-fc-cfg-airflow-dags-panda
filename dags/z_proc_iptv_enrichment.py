@@ -1,3 +1,13 @@
+# Nome da DAG: z_proc_iptv_enrichment
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: Sem descrição detalhada
+# Usa Druid?: Não
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 1 3 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # v7
 from airflow import DAG
 from airflow.operators.python import PythonOperator

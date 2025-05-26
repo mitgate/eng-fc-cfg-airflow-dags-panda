@@ -1,3 +1,12 @@
+# Nome da DAG: agg_pm_counter_status
+# Owner / responsável: leandro
+# Descrição do objetivo da DAG: Executa a query no Druid via HTTP/SQL. Se falhar com 500, refaz com filtro sourceSystem em ('OSS-RC','Taishan Core').
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: pm_collector_status_history
+# Frequência de execução (schedule): 0 2 * * *
+# Dag Activo?: 
+# Autor: leandro
+# Data de modificação: 2025-05-26
 import json
 import logging
 import tempfile

@@ -1,3 +1,12 @@
+# Nome da DAG: druid_delete_segments_outlier
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: ti = kwargs['ti']      data = ti.xcom_pull(task_ids='get_dates_from_druid', key='datas_do_druid')
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: sys.segments
+# Frequência de execução (schedule): 0 5 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago

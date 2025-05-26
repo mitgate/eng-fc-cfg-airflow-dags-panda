@@ -1,3 +1,13 @@
+# Nome da DAG: z_generate_lookup_hls
+# Owner / responsável: Sadir
+# Descrição do objetivo da DAG: DAG para gerar o lookup dos hls.
+# Usa Druid?: Sim
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 3 3 * * *
+# Dag Activo?: 
+# Autor: Sadir
+# Data de modificação: 2025-05-26
+
 # v1
 from airflow import DAG
 from airflow.operators.python import PythonOperator

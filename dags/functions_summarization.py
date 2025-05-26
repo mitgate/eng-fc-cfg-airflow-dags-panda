@@ -1,3 +1,13 @@
+# Nome da DAG: functions_summarization
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: Módulo de funciones en Python para el procesamiento de DAGs de Sumarización en el ambiente desarrollo
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: 
+# Frequência de execução (schedule): 
+# Dag Activo?: 
+# Autor: CoE
+# Data de modificação: 2025-05-26
+
 #from sqlalchemy import text
 #from sqlalchemy import create_engine
 #from confluent_kafka import Producer

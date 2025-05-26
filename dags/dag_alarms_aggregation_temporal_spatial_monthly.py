@@ -1,3 +1,19 @@
+# Nome da DAG: dag_alarms_aggregation_temporal_spatial_monthly
+# Owner / responsável: CoE
+# Descrição do objetivo da DAG: 
+# 1. Busca en Postgres Prd los thesholds con granularidad = mes
+# 2. Por cada registro de configuración de Threshold, se lanza una petición a druid adapter con el fin de obtener la consulta SQL que será ejecutada por Druid para la generación de la métrica deseada.
+# 3. Se lanza la ejecución en Druid de cada consulta SQL generada en el paso anterior.
+# 4. Envia cada fila del resultado obtenido kafka
+# 
+# Nota: 
+# Las funciones usadas están guardadas en el archivo functions.py
+# Usa Druid?: Si
+# Principais tabelas / consultas Druid acessadas: snmp-enriched-metrics fastoss-pm-enriched-metrics
+# Frequência de execução (schedule): Cada mes
+# Dag Activo?: Si
+# Autor: CoE
+# Data de modificação: 2025-05-26
 from airflow import DAG
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
