@@ -1,11 +1,11 @@
 # Nome da DAG: z_redirect_messages_alert
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG redirecionar mensagens do kafka.
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): * * * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # V0
@@ -30,7 +30,7 @@ CG_ID= 'redirect-btw-topics-airflow'
 
 dag = DAG(
     'Redirect_Messages_btw_topics',
-    default_args={'owner': 'Sadir', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
+    default_args={'owner': 'Leandro', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
     description='DAG redirecionar mensagens do kafka.',
     schedule_interval='* * * * *',
     start_date=datetime(2024, 9, 9),

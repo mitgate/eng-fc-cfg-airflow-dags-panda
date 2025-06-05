@@ -29,7 +29,7 @@ class DruidConnector():
         connector = DruidConnector(druid_url_variable=druid_url_variable_name, r_delay=10, retries=3)
         ```          
     Created By:
-        Sadir ヾ(•ω•`)o
+        Leandro ヾ(•ω•`)o
     """
     def __init__(self, druid_url_variable, r_delay=15, retries=5):
         self.retry_delay = r_delay

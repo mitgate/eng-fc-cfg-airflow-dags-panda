@@ -148,8 +148,8 @@ def get_spatial_time_variables(var_datetime, minutos):
 
     if minutos == 5:
         # Delta
-        datetime_ = datetime_ - timedelta(hours=3)
-        print("Fecha Base (Espacial 5M - Delta 3H):", datetime_)
+        datetime_ = datetime_ - timedelta(minutes=10)
+        print("Fecha Base (Espacial 5M - Delta 10minutes):", datetime_)
    
     var_mod = (var_minutos%minutos)                 
     var_end = (datetime_ - timedelta(minutes=var_mod))                       

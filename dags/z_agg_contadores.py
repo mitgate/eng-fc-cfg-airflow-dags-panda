@@ -1,11 +1,11 @@
 # Nome da DAG: z_agg_contadores
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para agregação de contadores.
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 1/15 * * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # v7
@@ -23,7 +23,7 @@ from utils.date_utils import DateUtils
 dag = DAG(
     'Agg_Counters',
     default_args={
-        'owner': 'Sadir',
+        'owner': 'Leandro',
         'depends_on_past': False,
         'retries': 0,
         'retry_delay': timedelta(minutes=5),

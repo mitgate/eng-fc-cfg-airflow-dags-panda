@@ -1,11 +1,11 @@
 # Nome da DAG: y_status_elementos
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG status elementos com cache Redis.
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: elements_status
 # Frequência de execução (schedule): 
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # V0
@@ -67,7 +67,7 @@ redis_client = None
 # Definir a DAG
 dag = DAG(
     'poc_status_elementos_V5',
-    default_args={'owner': 'Sadir', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
+    default_args={'owner': 'Leandro', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
     description='DAG status elementos com cache Redis.',
     schedule_interval=None,
     start_date=datetime(2024, 9, 9),

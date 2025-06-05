@@ -1,11 +1,11 @@
 # Nome da DAG: warmup_core_ps
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para filtrar dashboards contendo (5G) e enviar dados para aquecimento de cache
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 30 0-22/2 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 from airflow import DAG
@@ -21,7 +21,7 @@ from airflow.exceptions import AirflowSkipException
 dag = DAG(
     'Core_PS',
     default_args={
-        'owner': 'Sadir',
+        'owner': 'Leandro',
         'depends_on_past': False,
         'retries': 0,
         'retry_delay': timedelta(minutes=5),

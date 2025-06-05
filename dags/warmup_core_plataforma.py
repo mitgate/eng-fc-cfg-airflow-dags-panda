@@ -1,11 +1,11 @@
 # Nome da DAG: warmup_core_plataforma
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para filtrar dashboards contendo (PLATAFORMA) e enviar dados para aquecimento de cache
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 10 0-22/2 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 from airflow import DAG
@@ -23,7 +23,7 @@ SUPERSET_URL = Variable.get("superset_prd_host")
 
 # Definindo argumentos padrão da DAG
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),

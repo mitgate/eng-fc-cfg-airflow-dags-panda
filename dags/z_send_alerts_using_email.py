@@ -295,7 +295,7 @@ def main():
        
 dag = DAG(
     'Send_Alerts_Using_Email',
-    default_args={'owner': 'Sadir', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
+    default_args={'owner': 'Leandro', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
     description='DAG para enviar alertas por e-mail 📩',
     schedule_interval='* * * * *',
     start_date=datetime(2024, 9, 9),

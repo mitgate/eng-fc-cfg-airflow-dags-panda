@@ -1,11 +1,11 @@
 # Nome da DAG: z_generate_lookup_hls
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para gerar o lookup dos hls.
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 3 3 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # v1
@@ -23,7 +23,7 @@ from utils.date_utils import DateUtils
 dag = DAG(
     'Generate_Lookup_HL',
     default_args={
-        'owner': 'Sadir',
+        'owner': 'Leandro',
         'depends_on_past': False,
         'retries': 0,
         'retry_delay': timedelta(minutes=5),

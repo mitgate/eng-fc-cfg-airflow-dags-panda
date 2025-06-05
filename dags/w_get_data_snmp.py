@@ -1,5 +1,5 @@
 # Nome da DAG: w_get_data_snmp
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para gerar dados agregados do Druid...
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: druid
@@ -66,14 +66,50 @@ DELAY_RETRY_DRUID = int(Variable.get('aggregation_retry_delay_druid', 5))
 AMBIENTE = Variable.get('aggregation_ambiente', 'dev')
 DRUID_API_URL = Variable.get('druid_prod_url') + '/druid/v2/sql'
 
+# def send_query_to_druid(query, retries=RETRY_DRUID, delay=DELAY_RETRY_DRUID):
+#     url = DRUID_API_URL
+#     payload = json.dumps({
+#         "query": query,
+#         "resultFormat": "object",
+#         "header": True,
+#         "typesHeader": True,
+#         "sqlTypesHeader": True,
+#         "context": {
+#             "enableWindowing": True,
+#             "useParallelMerge": True,
+#             "executionMode": "ASYNC",
+#             "timeout": 280000,
+#             "populateCache": True,
+#             "useCache": True
+#         }
+#     })
+#     headers = {
+#         'Accept': 'application/json, text/plain, */*',
+#         'Content-Type': 'application/json'
+#     }
+#     for attempt in range(1, retries + 1):
+#         try:
+#             resp = requests.post(url, headers=headers, data=payload, timeout=180)
+#             resp.raise_for_status()
+#             return resp.json()[1:]
+#         except requests.RequestException as e:
+#             print(f"[Druid] Erro tentativa {attempt}: {e}")
+#             if attempt < retries:
+#                 time.sleep(delay)
+#             else:
+#                 print("Druid falhou após todas as tentativas.")
+#                 raise AirflowSkipException("Falha crítica ao acessar Druid.")
 def send_query_to_druid(query, retries=RETRY_DRUID, delay=DELAY_RETRY_DRUID):
+    """
+    Executa a consulta SQL no Druid e devolve uma lista de dicionários,
+    lendo a resposta linha-a-linha para não estourar o buffer de JSON.
+    """
     url = DRUID_API_URL
+
     payload = json.dumps({
         "query": query,
-        "resultFormat": "object",
-        "header": True,
-        "typesHeader": True,
-        "sqlTypesHeader": True,
+        "resultFormat": "arrayLines",  # ← muda para ‘arrayLines’
+        "header": False,               # ← sem cabeçalhos extras
         "context": {
             "enableWindowing": True,
             "useParallelMerge": True,
@@ -83,15 +119,32 @@ def send_query_to_druid(query, retries=RETRY_DRUID, delay=DELAY_RETRY_DRUID):
             "useCache": True
         }
     })
+
     headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
+        "Accept": "application/json",
+        "Content-Type": "application/json"
     }
+
     for attempt in range(1, retries + 1):
         try:
-            resp = requests.post(url, headers=headers, data=payload, timeout=180)
+            # stream=True permite consumir gradualmente
+            resp = requests.post(
+                url,
+                headers=headers,
+                data=payload,
+                timeout=(10, 300),   # (connect, read)
+                stream=True
+            )
             resp.raise_for_status()
-            return resp.json()[1:]
+
+            # Constrói a lista linha-a-linha
+            result_rows = []
+            for line in resp.iter_lines():
+                if line:                       # ignora keep-alive
+                    result_rows.append(json.loads(line))
+
+            return result_rows
+
         except requests.RequestException as e:
             print(f"[Druid] Erro tentativa {attempt}: {e}")
             if attempt < retries:
@@ -99,6 +152,9 @@ def send_query_to_druid(query, retries=RETRY_DRUID, delay=DELAY_RETRY_DRUID):
             else:
                 print("Druid falhou após todas as tentativas.")
                 raise AirflowSkipException("Falha crítica ao acessar Druid.")
+
+
+
 
 def find_latest_time(json_array):
     valid_jsons = [item for item in json_array if '__time' in item and item['__time']]
@@ -188,7 +244,7 @@ def main():
         raise AirflowSkipException('Aguardando janela de coleta')
 
     # Fatiar o período em janelas menores para não travar o Druid!
-    max_hours = 1  # 1 hora por query (ajuste se necessário)
+    max_hours = 0.25  # 1 hora por query (ajuste se necessário)
     total_minutes = INTERVALO_MINUTOS
     num_windows = max(1, int(total_minutes / (max_hours * 60)))
     windows = []

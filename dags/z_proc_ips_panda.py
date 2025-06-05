@@ -1,11 +1,11 @@
 # Nome da DAG: z_proc_ips_panda
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para comparar dados do Netcompass com Druid
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 10 1 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 #%% v3
@@ -67,7 +67,7 @@ def main():
 
 dag = DAG(
     'Proc_IPS_PANDA',
-    default_args={'owner': 'Sadir', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
+    default_args={'owner': 'Leandro', 'depends_on_past': False, 'retries': 0, 'retry_delay': timedelta(minutes=5)},
     description='DAG para comparar dados do Netcompass com Druid',
     schedule_interval='10 1 * * *',
     start_date=datetime(2024, 9, 9),

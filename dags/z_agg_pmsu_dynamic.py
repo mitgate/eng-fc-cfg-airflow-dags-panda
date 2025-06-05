@@ -498,13 +498,93 @@ GROUP BY
 """
 
 
+# def create_dag_function(aggregation_type, aggregation_name, config):
+#     """
+#     Função que gera o callable para a Tarefa PythonOperator,
+#     executando a consulta no Druid e publicando no Kafka.
+#     """
+#     def main():
+#         # Exemplo: se não houver valor, pega de 24h atrás em ISO8601
+#         string_past_24_hours = (
+#             datetime.now() - timedelta(hours=24)
+#         ).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+#         var_datetime_max = f"{VAR_DATETIME_MAX_PREFIX}_{aggregation_type}_{aggregation_name}"
+#         raw_start_date = get_airflow_variable(var_datetime_max, string_past_24_hours)
+
+#         print(f"[DEBUG] Valor da variável {var_datetime_max} = {raw_start_date}")
+
+#         # Converte a data ISO8601 -> formato 'YYYY-MM-DD HH:mm:ss' aceito pelo Druid
+#         start_date_formatted = format_date_for_druid(raw_start_date)
+#         print(f"[DEBUG] Data formatada para Druid = {start_date_formatted}")
+
+#         # Conexão com Druid
+#         druid = DruidConnector(druid_url_variable="druid_url")
+#         print("[DEBUG] Conexão estabelecida com Druid")
+
+#         # Se for agregação "pmsu_multilevel", chama a query aninhada
+#         if aggregation_name == "pmsu_multilevel":
+#             query = create_multilevel_aggregations_query(start_date_formatted)
+#             print("[DEBUG] Usando a query multinível (1m→5m→15m)")
+#         else:
+#             query = create_base_query(
+#                 aggregation=aggregation_name,
+#                 agg_param_druid=config['agg_param_druid'],
+#                 tag_counter=config['tag_counter'],
+#                 add_minutes_to_endtime=config['add_minutes_to_endtime'],
+#                 array_agg_size=config['array_agg_size'],
+#                 base_report_interval=config['base_report_interval'],
+#                 last_max_date=start_date_formatted,
+#                 internal_aggregation=config.get('internal_aggregation'),
+#                 internal_agg_param_druid=config.get('internal_agg_param_druid'),
+#                 internal_add_minutes_to_endtime=config.get('internal_add_minutes_to_endtime')
+#             )
+#             print(f"[DEBUG] Usando a query para {aggregation_name}")
+
+#         print(f"[DEBUG] Query gerada:\n{query}")
+
+#         # Executa a query
+#         result = druid.send_query(query)
+#         total_records = len(result) if result else 0
+#         print(f"[DEBUG] Retornou {total_records} registros do Druid")
+
+#         if result:
+#             # Publica no Kafka
+#             print("[DEBUG] Publicando registros no Kafka...")
+#             kafka = KafkaConnector(
+#                 topic_var_name="agg_counters_topic_pmsu",  # Tópico de agregados agg-pm-counter-aggregates-topic
+#                 kafka_url_var_name="prod_kafka_url",
+#                 kafka_port_var_name="prod_kafka_port",
+#                 kafka_variable_pem_content="pem_content",
+#                 kafka_connection_id="kafka_default"
+#             )
+#             producer = kafka.create_kafka_connection()
+#             kafka.send_mult_messages_to_kafka(menssages=result, producer=producer)
+#             print("[DEBUG] Publicação no Kafka concluída")
+
+#             # Identifica a maior data de "__time" retornada e salva na variável
+#             utils = DateUtils(data=result)
+#             max_date_from_column = utils.get_latest_date_parallel(
+#                 date_column=DATE_TIME_COLUMN_DRUID,
+#                 date_format="%Y-%m-%dT%H:%M:%S.%fZ"
+#             )
+#             print(f"[DEBUG] Maior data encontrada = {max_date_from_column}")
+
+#             set_airflow_variable(var_datetime_max, max_date_from_column)
+#             print(f"[DEBUG] Variável {var_datetime_max} atualizada = {max_date_from_column}")
+#         else:
+#             print("[DEBUG] Nenhum registro retornado. Skip.")
+#             raise AirflowSkipException('✅ No records returned. Process finished!')
+
+#     return main
+
 def create_dag_function(aggregation_type, aggregation_name, config):
     """
     Função que gera o callable para a Tarefa PythonOperator,
     executando a consulta no Druid e publicando no Kafka.
     """
     def main():
-        # Exemplo: se não houver valor, pega de 24h atrás em ISO8601
+        # Exemplo: se não houver valor, pega de 24 h atrás em ISO8601
         string_past_24_hours = (
             datetime.now() - timedelta(hours=24)
         ).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
@@ -514,7 +594,7 @@ def create_dag_function(aggregation_type, aggregation_name, config):
 
         print(f"[DEBUG] Valor da variável {var_datetime_max} = {raw_start_date}")
 
-        # Converte a data ISO8601 -> formato 'YYYY-MM-DD HH:mm:ss' aceito pelo Druid
+        # Converte a data ISO8601 → 'YYYY-MM-DD HH:mm:ss' (formato Druid)
         start_date_formatted = format_date_for_druid(raw_start_date)
         print(f"[DEBUG] Data formatada para Druid = {start_date_formatted}")
 
@@ -522,22 +602,22 @@ def create_dag_function(aggregation_type, aggregation_name, config):
         druid = DruidConnector(druid_url_variable="druid_url")
         print("[DEBUG] Conexão estabelecida com Druid")
 
-        # Se for agregação "pmsu_multilevel", chama a query aninhada
+        # Se for agregação “pmsu_multilevel” → usa a query de três níveis
         if aggregation_name == "pmsu_multilevel":
             query = create_multilevel_aggregations_query(start_date_formatted)
             print("[DEBUG] Usando a query multinível (1m→5m→15m)")
         else:
             query = create_base_query(
                 aggregation=aggregation_name,
-                agg_param_druid=config['agg_param_druid'],
-                tag_counter=config['tag_counter'],
-                add_minutes_to_endtime=config['add_minutes_to_endtime'],
-                array_agg_size=config['array_agg_size'],
-                base_report_interval=config['base_report_interval'],
+                agg_param_druid=config["agg_param_druid"],
+                tag_counter=config["tag_counter"],
+                add_minutes_to_endtime=config["add_minutes_to_endtime"],
+                array_agg_size=config["array_agg_size"],
+                base_report_interval=config["base_report_interval"],
                 last_max_date=start_date_formatted,
-                internal_aggregation=config.get('internal_aggregation'),
-                internal_agg_param_druid=config.get('internal_agg_param_druid'),
-                internal_add_minutes_to_endtime=config.get('internal_add_minutes_to_endtime')
+                internal_aggregation=config.get("internal_aggregation"),
+                internal_agg_param_druid=config.get("internal_agg_param_druid"),
+                internal_add_minutes_to_endtime=config.get("internal_add_minutes_to_endtime"),
             )
             print(f"[DEBUG] Usando a query para {aggregation_name}")
 
@@ -549,24 +629,34 @@ def create_dag_function(aggregation_type, aggregation_name, config):
         print(f"[DEBUG] Retornou {total_records} registros do Druid")
 
         if result:
-            # Publica no Kafka
-            print("[DEBUG] Publicando registros no Kafka...")
+            # ───────────────────────────────────────────────────────────
+            # Escolha dinâmica do tópico:
+            #   • pmsu_multilevel  →  agg_counters_topic_pmsu   (FINAL)
+            #   • Demais agregações → agg_pm_counter_aggregates_topic (AUX)
+            # ───────────────────────────────────────────────────────────
+            topic_to_use = (
+                "agg_counters_topic_pmsu"
+                if aggregation_name == "pmsu_multilevel"
+                else "agg_pm_counter_aggregates_topic"
+            )
+            print(f"[DEBUG] Publicando registros no Kafka → topic: {topic_to_use}")
+
             kafka = KafkaConnector(
-                topic_var_name="agg-pm-counter-aggregates-topic",  # Tópico de agregados
+                topic_var_name=topic_to_use,
                 kafka_url_var_name="prod_kafka_url",
                 kafka_port_var_name="prod_kafka_port",
                 kafka_variable_pem_content="pem_content",
-                kafka_connection_id="kafka_default"
+                kafka_connection_id="kafka_default",
             )
             producer = kafka.create_kafka_connection()
             kafka.send_mult_messages_to_kafka(menssages=result, producer=producer)
             print("[DEBUG] Publicação no Kafka concluída")
 
-            # Identifica a maior data de "__time" retornada e salva na variável
+            # Atualiza variável com a maior data retornada
             utils = DateUtils(data=result)
             max_date_from_column = utils.get_latest_date_parallel(
                 date_column=DATE_TIME_COLUMN_DRUID,
-                date_format="%Y-%m-%dT%H:%M:%S.%fZ"
+                date_format="%Y-%m-%dT%H:%M:%S.%fZ",
             )
             print(f"[DEBUG] Maior data encontrada = {max_date_from_column}")
 
@@ -574,10 +664,9 @@ def create_dag_function(aggregation_type, aggregation_name, config):
             print(f"[DEBUG] Variável {var_datetime_max} atualizada = {max_date_from_column}")
         else:
             print("[DEBUG] Nenhum registro retornado. Skip.")
-            raise AirflowSkipException('✅ No records returned. Process finished!')
+            raise AirflowSkipException("✅ No records returned. Process finished!")
 
     return main
-
 
 #
 # Criação dinâmica das DAGs com base em 'base_json' (extra do connection pmsu_connection).

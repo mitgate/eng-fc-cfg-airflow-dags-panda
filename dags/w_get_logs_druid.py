@@ -1,11 +1,11 @@
 # Nome da DAG: w_get_logs_druid
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para coletar os logs do Druid
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): */5 * * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # 2
@@ -28,7 +28,7 @@ import subprocess
 
 # Definindo argumentos padrão da DAG
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=10),

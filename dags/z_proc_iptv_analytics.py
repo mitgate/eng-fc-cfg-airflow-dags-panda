@@ -1,11 +1,11 @@
 # Nome da DAG: z_proc_iptv_analytics
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: Sem descrição detalhada
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # v0.3
@@ -30,7 +30,7 @@ INDEX = "analytics"
 dag = DAG(
     DAG_NAME,
     default_args={
-        'owner': 'Sadir',
+        'owner': 'Leandro',
         'depends_on_past': False,
         'retries': 0,
         'retry_delay': timedelta(minutes=5),

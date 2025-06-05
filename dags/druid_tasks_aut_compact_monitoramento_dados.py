@@ -285,7 +285,7 @@ def start_tasks_compact_in_druid(**kwargs):
 }
 """
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'start_date': days_ago(1),
     'email_on_failure': False,

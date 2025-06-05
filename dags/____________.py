@@ -12,7 +12,7 @@ default_args = {
     'owner': 'airflow',
     'start_date': datetime(2025, 3, 19),
     'email_on_failure': True,  # Habilita o envio de e-mail em caso de falha
-    'email': ['sadir.cardoso@nttdata.com'],  # Substitua pelo seu e-mail
+    'email': ['leandro.rodriguezlopez@emeal.nttdata.com'],  # Substitua pelo seu e-mail
 }
 
 # Criando a DAG

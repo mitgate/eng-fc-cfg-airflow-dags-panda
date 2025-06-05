@@ -1,11 +1,11 @@
 # Nome da DAG: w_get_aggregate_data_matriz
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para gerar dados agregados do Druid(v9)
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: druid
 # Frequência de execução (schedule): 
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 import asyncio
@@ -40,7 +40,7 @@ SEGMENT_SIZE_AGG = int(Variable.get('segment_agg'))
 MAX_REQUESTS_PER_SECOND = int(Variable.get('max_requests_per_second'))
 
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=10),

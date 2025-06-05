@@ -1,11 +1,11 @@
 # Nome da DAG: z_ingestion_netcompass
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para gerar o lookup dos hls.
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 3 0 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 # v2
@@ -25,7 +25,7 @@ LIMIT = 100
 dag = DAG(
     'Ingestion_Netcompass_Data',
     default_args={
-        'owner': 'Sadir',
+        'owner': 'Leandro',
         'depends_on_past': False,
         'retries': 0,
         'retry_delay': timedelta(minutes=5),

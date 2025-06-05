@@ -1,11 +1,11 @@
 # Nome da DAG: druid_delete_segments_outlier
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: ti = kwargs['ti']      data = ti.xcom_pull(task_ids='get_dates_from_druid', key='datas_do_druid')
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: sys.segments
 # Frequência de execução (schedule): 0 5 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -59,7 +59,7 @@ def delete_segments_outlier(**kwargs):
     else:
         raise AirflowSkipException('Estapa pulada por não ser necessária a intervenção automática.')
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'start_date': days_ago(1),
     'email_on_failure': False,

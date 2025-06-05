@@ -1,11 +1,11 @@
 # Nome da DAG: warmup_core_monitoramento
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para filtrar dashboards contendo (5G) e enviar dados para aquecimento de cache
 # Usa Druid?: Não
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): 20 1-23/2 * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 from airflow import DAG
@@ -22,7 +22,7 @@ TAG_FILTRO = Variable.get("tag_warmup_monitoramento")
 SUPERSET_URL = Variable.get("superset_prd_host")
 
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),

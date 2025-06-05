@@ -37,7 +37,7 @@ class KafkaConnector():
         kafka.publish_message_with_key(test,producer)```
               
     Created By:
-        Sadir ヾ(•ω•`)o
+        Leandro ヾ(•ω•`)o
     """
     def __init__(self,topic_var_name,kafka_url_var_name,kafka_port_var_name,kafka_variable_pem_content,kafka_connection_id):
        

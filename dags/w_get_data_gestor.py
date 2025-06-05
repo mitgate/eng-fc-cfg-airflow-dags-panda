@@ -1,11 +1,11 @@
 # Nome da DAG: w_get_data_gestor
-# Owner / responsável: Sadir
+# Owner / responsável: Leandro
 # Descrição do objetivo da DAG: DAG para gerar dados agregados do Druid...
 # Usa Druid?: Sim
 # Principais tabelas / consultas Druid acessadas: 
 # Frequência de execução (schedule): * * * * *
 # Dag Activo?: 
-# Autor: Sadir
+# Autor: Leandro
 # Data de modificação: 2025-05-26
 
 #%% 4
@@ -30,7 +30,7 @@ import time
 
 # Definindo argumentos padrão da DAG
 default_args = {
-    'owner': 'Sadir',
+    'owner': 'Leandro',
     'depends_on_past': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=10),

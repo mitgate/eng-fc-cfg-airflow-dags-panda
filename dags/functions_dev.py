@@ -29,10 +29,6 @@ import json
 import time
 import re
 import ssl
-import threading
-import string
-import secrets
-import urllib.parse
 import jaydebeapi 
 
 #connection = BaseHook.get_connection('postgres_default')
@@ -332,7 +328,7 @@ def druid_adapter_query(param_df_druid, aggregationTime, var_datetime, minutos):
                     effectivehours = ast.literal_eval(effectivehours) 
                 effectivehours_int = [str(int(h)) for h in effectivehours] 
                 hours_query = f'"hours": [{", ".join(effectivehours_int)}],'
-            print ("hours_query:", hours_query)
+            #print ("hours_query:", hours_query)
 
             effectivedays = row["effectivedays"]  
             optionsdays = row["optionsdays"]  
@@ -353,7 +349,7 @@ def druid_adapter_query(param_df_druid, aggregationTime, var_datetime, minutos):
             #     days = json.loads(row['day2'].replace("'", '"'))
             #     day_numbers = [day_to_number[day] for day in days]
             #     day_numbers_sql = ', '.join(map(str, day_numbers))
-            print ("dayofweek_query:", dayofweek_query)
+            #print ("dayofweek_query:", dayofweek_query)
 
             ngInclusion = ""
             equimentInclusion = ""
@@ -500,13 +496,13 @@ def druid_adapter_query(param_df_druid, aggregationTime, var_datetime, minutos):
                 if response.status_code == 200:
                     sql = response.json()['data']['getSqlQueryFromCriteria']
                     sql_queries.append(sql + '&&' + query_select) 
-                else:
-                    query_update = f'''
-                        UPDATE {tb_control_load}  
-                        SET status ='ERROR', log ='Error al ejecutar druid adapter'
-                        WHERE threshold_id ='{row['node_id']}' AND status='LOAD'
-                    ''' 
-                    execute_Query(query_update, "", "UPDATE", False)   
+                # else:
+                #     query_update = f'''
+                #         UPDATE {tb_control_load}  
+                #         SET status ='ERROR', log ='Error al ejecutar druid adapter'
+                #         WHERE threshold_id ='{row['node_id']}' AND status='LOAD'
+                #     ''' 
+                #     execute_Query(query_update, "", "UPDATE", False)   
             except json.JSONDecodeError as e:
                 print("Error al ejecutar druid adapter:", e)
                 raise e
@@ -598,14 +594,14 @@ def get_datos_sql_druid(sql,e):
             print("No se encontraron valores en metricId IN")
             valores_name_in = []
         
-        for kpi in valores_name_in:
-            query_update = f'''
-                UPDATE {tb_control_load}
-                SET status ='ERROR', log ='"Error al intentar ejecutar consultas en druid:"{e} ' 
-                WHERE kpi_id='{kpi}' AND managedobject_id='{valor_managed_object}' AND granularityinterval='{valor_granularityInterval}'
-                    {var_networkGroup} {cadena_dn} and start_date='{fechas[0]}' and end_date='{fechas[1]}' AND status='LOAD'"
-            ''' 
-            execute_Query(query_update, "", "UPDATE", False)
+        # for kpi in valores_name_in:
+        #     query_update = f'''
+        #         UPDATE {tb_control_load}
+        #         SET status ='ERROR', log ='"Error al intentar ejecutar consultas en druid:"{e} ' 
+        #         WHERE kpi_id='{kpi}' AND managedobject_id='{valor_managed_object}' AND granularityinterval='{valor_granularityInterval}'
+        #             {var_networkGroup} {cadena_dn} and start_date='{fechas[0]}' and end_date='{fechas[1]}' AND status='LOAD'
+        #     ''' 
+        #     execute_Query(query_update, "", "UPDATE", False)
     except Exception as e:
         print(repr(e))
         raise e
@@ -638,7 +634,7 @@ def execute_druid_query(sql_queries_str):
                 get_datos_sql_druid(lista_sql[0],e)               
                 print(repr(e))
                 raise e 
-    print ("results druid:", results)
+    #print ("results druid:", results)
     return results
 
 
@@ -677,7 +673,12 @@ def create_nested_json(response_list, reportInterval, granularityInterval):
             for index, row in df.iterrows(): 
                 query = "SELECT load_status FROM " + tb_threshold + " WHERE node_id='" + node_id + "' AND kpi_id='" + row['metricId'] + "'"
                 result = executeQuery(query)
-                load_status = result['load_status'][0]
+                load_status = ""
+                if not result.empty:
+                    load_status = result['load_status'].iloc[0]  
+                else:
+                    print("Error: El DataFrame está vacío.")
+                    print("Query:", query)
 
                 json_data = createJson(beginTime, endTime, row, aggregate, spatialaggregation, spatial_location, spatial_MO, networkGroup, reportInterval, granularityInterval, load_status, node_id, isRate)
                 json_list.append(json_data) 
@@ -807,7 +808,7 @@ def produce_message_to_topic_kafka(response_list, reportInterval, granularityInt
     conf, topic = get_kafka_config()
     p = Producer(**conf)
         
-    if algorithm != 'AVERAGE_HISTORICAL_VALUE':     
+    if algorithm == 'ABSOLUTE_VALUE':     
         if len(response_list) > 0:
             for response in response_list:
                 df = response[0]            
@@ -842,15 +843,19 @@ def produce_message_to_topic_kafka(response_list, reportInterval, granularityInt
                     load_status = result['load_status'][0]
 
                     json_data = createJson(beginTime,endTime,row,aggregate,spatialaggregation,spatial_location,spatial_MO,networkGroup,reportInterval,granularityInterval, load_status,node_id,isRate)
-                    print("json_data:", json_data)
+                    json_data_dict = json.loads(json_data)
+                    data_dict = {
+                        "current": clean_none_values(json_data_dict),  
+                        "values": {},
+                        "thresholdId": node_id
+                    }
 
-                    data_dict = json.loads(json_data)
-                    data_dict_clean = clean_none_values (data_dict)
-                    var_dn = data_dict_clean.get("dn", "default_dn")  
-                    var_threshold_id = data_dict_clean.get("thresholdId", "default_threshold")  
+                    var_dn = data_dict.get("dn", "default_dn")  
+                    var_threshold_id = data_dict.get("thresholdId", "default_threshold")  
 
-                    data_str = json.dumps(data_dict_clean, ensure_ascii=False ) 
+                    data_str = json.dumps(data_dict, ensure_ascii=False )                     
                     data_bytes = data_str.encode('utf-8') 
+                    print("data_str:", data_str)
 
                     key_str = f"{var_dn}+{var_threshold_id}"  
                     key_bytes = key_str.encode('utf-8')  
@@ -927,27 +932,27 @@ def send_to_kafka(producer, topic, key_bytes, data_bytes, where):
     try:       
         producer.produce(topic, key=key_bytes, value=data_bytes, callback=delivery_report)                    
         producer.flush()   
-        status = "SUCESSFULL"
-        log = "Datos cargados con exito en Kafka al topico:" + topic        
-        query_update = f'''UPDATE {tb_control_load} SET status ='{status}', log ='{log}', pending = 0
-                        {where}'''
-        print("status:", status)
+        # status = "SUCESSFULL"
+        # log = "Datos cargados con exito en Kafka al topico:" + topic        
+        # query_update = f'''UPDATE {tb_control_load} SET status ='{status}', log ='{log}', pending = 0
+        #                 {where}'''
+        # print("status:", status)
     except Exception as e:
         print("Error al enviar mensaje: {}".format(e))
-        status = "ERROR"
-        log = "Error de entrega en Kafka:" + e
-        query_update = f'''UPDATE {tb_control_load} SET status ='{status}', log ='{log}'
-                        {where}''' 
+        # status = "ERROR"
+        # log = "Error de entrega en Kafka:" + e
+        # query_update = f'''UPDATE {tb_control_load} SET status ='{status}', log ='{log}'
+        #                 {where}''' 
         raise e
     finally:
-        execute_Query(query_update,"","UPDATE",False)  
+        #execute_Query(query_update,"","UPDATE",False)  
         producer.flush()
 
 
 def insert_load_data(kpi_id,manageObject_id,var_data_time_granularity,networkgroups,equipments,v_delay,v_compleness,records_load_druid,status,formatted_init_datetime,formatted_end_datetime,aggregationTime,node_id,log,load_aggregationTime, load_status):
     data = f''' INSERT INTO {tb_control_load} (kpi_id, managedobject_id, granularityinterval, 
                 networkgroups, equipments, delay, completness, records, status, start_date, end_date, 
-                aggregation_time, load_datatime,pending,log,threshold_id) 
+                aggregation_time, load_datatime, pending, log, threshold_id) 
             VALUES ('{kpi_id}', '{manageObject_id}', '{var_data_time_granularity}', '{networkgroups}', '{equipments}', {v_delay}, {v_compleness}, {records_load_druid}, '{status}', '{formatted_init_datetime}', '{formatted_end_datetime}','{aggregationTime}', '{formatted_end_datetime}',{records_load_druid},'{log}','{node_id}')
             '''
                     
@@ -972,12 +977,12 @@ def insert_load_data(kpi_id,manageObject_id,var_data_time_granularity,networkgro
     
     execute_Query (data,datos_a_insertar, "INSERT", True)
     
-    query_update =f'''UPDATE {tb_threshold} 
-                      SET load_status = '{load_status}' 
-                      WHERE "node_id" = '{node_id}' AND "kpi_id" = '{kpi_id}'{load_aggregationTime}
-                '''
-    #print("update",query_update) 
-    execute_Query (query_update,"", "UPDATE", False)
+    # query_update =f'''UPDATE {tb_threshold} 
+    #                   SET load_status = '{load_status}' 
+    #                   WHERE "node_id" = '{node_id}' AND "kpi_id" = '{kpi_id}'{load_aggregationTime}
+    #             '''
+    # #print("update",query_update) 
+    # execute_Query (query_update,"", "UPDATE", False)
 
 
 def get_data_load (node_id, dataTableName, kpi_id, manageObject_id, data_aggregation_time_granularity, formatted_init_datetime, formatted_end_datetime, networkgroups, equipments, aggregationTime, minutos):
@@ -1020,83 +1025,105 @@ def get_data_load (node_id, dataTableName, kpi_id, manageObject_id, data_aggrega
 
     print("query_metrics:", query_metrics)
 
+    # query_postgress = f'''SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY records) AS records 
+    #                     FROM {tb_control_load}
+    #                     WHERE kpi_id ='{kpi_id}' AND managedObject_id = '{manageObject_id}' AND granularityinterval = '{var_data_time_granularity}'
+    #                         AND aggregation_time='{aggregationTime}' {var_networkgroups} {var_equipments} 
+    #                     '''
     query_postgress = f'''SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY records) AS records 
                         FROM {tb_control_load}
-                        WHERE kpi_id ='{kpi_id}' AND managedObject_id = '{manageObject_id}' AND granularityinterval = '{var_data_time_granularity}'
-                            AND aggregation_time='{aggregationTime}' {var_networkgroups} {var_equipments} 
+                        WHERE threshold_id ='{node_id}' 
+                        LIMIT 12
                         '''
+
+    print("query_postgress:", query_postgress)
     records_postgress = executeQuery(query_postgress)
 
     #query_update=f'''UPDATE PANDA.threshold SET load_status ='' WHERE "node_id"='{node_id}' AND "kpi_id" ='{kpi_id}' {load_aggregationTime}''' 
     #execute_Query(query_update,"","UPDATE",False)
 
-    if minutos == 5:
-        delay = Variable.get("delay_5M(sec)")  
-    elif minutos == 15:
-         delay = Variable.get("delay_15M(sec)")  
-    elif minutos == 30:
-         delay = Variable.get("delay_30M(sec)")  
-    elif minutos == 60:
-         delay = Variable.get("delay_60M(sec)")
-    else:  
-        delay = Variable.get("delay(sec)")   
+    # if minutos == 5:
+    #     delay = Variable.get("delay_5M(sec)")  
+    # elif minutos == 15:
+    #      delay = Variable.get("delay_15M(sec)")  
+    # elif minutos == 30:
+    #      delay = Variable.get("delay_30M(sec)")  
+    # elif minutos == 60:
+    #      delay = Variable.get("delay_60M(sec)")
+    # else:  
+    #     delay = Variable.get("delay(sec)")   
     
-    print("delay:", delay)
+    # print("delay:", delay)
 
-    compleness = Variable.get("completitud(%)")
-    if delay:
-        v_delay = int(delay)
-    if compleness:
-        v_compleness = int (Variable.get("completitud(%)"))
-        v_compleness_p = v_compleness/100 
+    # compleness = Variable.get("completitud(%)")
+    # if delay:
+    #     v_delay = int(delay)
+    # if compleness:
+    #     v_compleness = int (Variable.get("completitud(%)"))
+    #     v_compleness_p = v_compleness/100 
     
-    status = "INIT"        
-    start_time = time.time()  # Obtener el tiempo actual             
-    cont = 10
-    while True:
-        print("metricId:", kpi_id)
-        records_metrics = execute_query_druid(query_metrics)          
-        if len(records_metrics) > 0:       
-            records = records_metrics.loc[0, 'records']
-            records_load_druid= int(records) #dato cargado de metricas
+    v_delay = 0
+    v_compleness = 90
+    v_compleness_p = v_compleness/100     
+    status = ""        
+    sw = True
+
+    #start_time = time.time()  # Obtener el tiempo actual             
+    #cont = 10
+    #while True:
+
+    print("metricId:", kpi_id)
+    records_metrics = execute_query_druid(query_metrics)          
+    if len(records_metrics) > 0:       
+        records = records_metrics.loc[0, 'records']
+        records_load_druid= int(records) #dato cargado de metricas
             
-            if records_postgress['records'][0] is None:
-                records_metrics_postgress = 0
-            else: 
-                records_metrics_postgress = records_postgress['records'][0]
+        if records_postgress['records'][0] is None:
+            records_metrics_postgress = 0
+            status = "First Load"
+            message_log = "Iniciando proceso de carga"
+        else: 
+            records_metrics_postgress = records_postgress['records'][0]
+            status="Success"  
+            message_log = "Carga existosa"
             
-            print("records_metrics_postgres:", records_metrics_postgress)
+        print("records_metrics_postgres:", records_metrics_postgress)
             
-            datos_aceptables = round(records_metrics_postgress*v_compleness_p)   
-            print("records_load_druid:", records_load_druid)
-            print("datos_aceptables:", datos_aceptables)             
+        datos_aceptables = round(records_metrics_postgress*v_compleness_p)   
+        print("records_load_druid:", records_load_druid)
+        print("datos_aceptables:", datos_aceptables)             
             
-            if (records_load_druid >= datos_aceptables) and (records_load_druid > 0):  
-                status="LOAD"                 
-                insert_load_data(kpi_id,manageObject_id,var_data_time_granularity,networkgroups,equipments,v_delay,v_compleness,records_load_druid,status,formatted_init_datetime,formatted_end_datetime,aggregationTime,node_id,'Iniciando proceso de carga',load_aggregationTime, 'Completed')
-                break 
-            
-        elapsed_time = time.time() - start_time
-        print("elapsed_time:", elapsed_time)
-        
-        if elapsed_time >= v_delay:
-            break        
-        
-        if minutos > 5:
-            cont=cont*2 
+        if (records_load_druid >= datos_aceptables) and (records_load_druid > 0):                             
+            insert_load_data(kpi_id, manageObject_id, var_data_time_granularity, networkgroups, equipments, v_delay, v_compleness, records_load_druid, status, formatted_init_datetime, formatted_end_datetime, aggregationTime,node_id, message_log, load_aggregationTime, 'Completed')
+            #break 
         else:
-            cont=120 
+            status = "Error"
+            insert_load_data(kpi_id,manageObject_id,var_data_time_granularity,networkgroups,equipments,v_delay,v_compleness,records_load_druid,status,formatted_init_datetime,formatted_end_datetime,aggregationTime,node_id,'No se encontraron los registros suficientes para hacer la carga',load_aggregationTime, 'Partial')
+            sw = False
+            
+        #elapsed_time = time.time() - start_time
+        #print("elapsed_time:", elapsed_time)
         
-        print("tiempo pausa:", cont)     
-        time.sleep(cont) 
+        #if elapsed_time >= v_delay:
+        #    break        
+        
+        #if minutos > 5:
+        #    cont=cont*2 
+        #else:
+        #    cont=120 
+        
+        #print("tiempo pausa:", cont)     
+        #time.sleep(cont) 
 
-    if status == "INIT":
-        status = "PARTIAL"
-        insert_load_data(kpi_id,manageObject_id,var_data_time_granularity,networkgroups,equipments,v_delay,v_compleness,records_load_druid,status,formatted_init_datetime,formatted_end_datetime,aggregationTime,node_id,'No se encontraron los registros suficientes para hacer la carga',load_aggregationTime, 'Partial')
-       
+    #if status == "INIT":
+    #    status = "PARTIAL"
+    #    insert_load_data(kpi_id,manageObject_id,var_data_time_granularity,networkgroups,equipments,v_delay,v_compleness,records_load_druid,status,formatted_init_datetime,formatted_end_datetime,aggregationTime,node_id,'No se encontraron los registros suficientes para hacer la carga',load_aggregationTime, 'Partial')
+    return sw
      
+
 def prepared_data_load(param_df_threshold, var_datetime, aggregationTime, minutos):
     row = pd.read_json(StringIO(param_df_threshold), orient='records')
+    sw = False
     
     manageObject_id = row.iloc[0]['managedObject_id'] 
     data_aggregation_time_granularity = row.iloc[0]['dataAggregationTimeGranularity'] if row.iloc[0]['dataAggregationTimeGranularity']!="null" else row.iloc[0]['kpi_defaultTimeGranularity']
@@ -1115,4 +1142,5 @@ def prepared_data_load(param_df_threshold, var_datetime, aggregationTime, minuto
         formatted_init_datetime, formatted_end_datetime=get_spatial_time_variables(var_datetime,minutos)   
         
         
-    get_data_load(node_id, dataTableName, kpi_id, manageObject_id, data_aggregation_time_granularity, formatted_init_datetime, formatted_end_datetime, networkgroups,equipments, aggregationTime, minutos)   
+    sw = get_data_load(node_id, dataTableName, kpi_id, manageObject_id, data_aggregation_time_granularity, formatted_init_datetime, formatted_end_datetime, networkgroups,equipments, aggregationTime, minutos)   
+    return sw

@@ -5,13 +5,15 @@
 # 2. Por cada registro de configuración de Threshold, se lanza una petición a druid adapter con el fin de obtener la consulta SQL que será ejecutada por Druid para la generación de la métrica deseada.
 # 3. Se lanza la ejecución en Druid de cada consulta SQL generada en el paso anterior.
 # 4. Envia cada fila del resultado obtenido kafka
-# Nota: Las funciones usadas están guardadas en el archivo functions.py
+# Nota: 
+# Este dag es una nueva versión que consulta y consolida en un json anidado las métricas históricas de las alarmas configuradas.
+# Las funciones usadas están guardadas en el archivo functions_v2.py
 # Usa Druid?: Si
 # Principais tabelas / consultas Druid acessadas: snmp-enriched-metrics fastoss-pm-enriched-metrics
 # Frequência de execução (schedule): Cada 15 minutos
 # Dag Activo?: Si
 # Autor: CoE
-# Data de modificação: 2025-05-26
+# Data de modificação: 2025-05-27
 from airflow import DAG
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
@@ -20,119 +22,95 @@ from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-import functions
+from airflow.decorators import dag, task
+from airflow.utils.task_group import TaskGroup
+from airflow.utils.dates import days_ago
 
+import json
+import functions_v2 as functions
+
+#VARIABLES
+varMinutes = 15
+varSeconds = 900  
+varDurationIso = "PT900S"
+varGranularity = "PT15M"
 
 default_args = {
     'owner': 'CoE',
-    'start_date': datetime(2024, 4, 26),
-    #'retries': 1,
-    #'retry_delay': timedelta(minutes=2),
+    'start_date': datetime(2024, 5, 26),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=2),
+    'email_on_failure': True,
+    'email': ['mbenitep@emeal.nttdata.com', 'danielgerardo.escamillamontoya@nttdata.com']
 }
 
-# Función para el control de carga
-def data_load_control_kpi(**kwargs):    
-    param_start_date = kwargs['start_date']
-    var_datetime = datetime.strptime(param_start_date, "%Y-%m-%d %H:%M:%S.%f%z")
-    result=functions.postgresData("dataAggregationTimeGranularity","PT15M")
-    functions.prepared_data_load(result,var_datetime,"PT15M", 15)
-
-
-# Función para realizar la consulta del dataframe
-def query_select_datataframe(**kwargs):
-    resut_json=functions.postgresData("dataAggregationTimeGranularity","PT15M")
-    return resut_json
-
-
-# Función para ejecutar la mutación Druid Adapter
-def druid_adapter_query(param_df_druid, param_start_date, **kwargs): 
-    var_datetime = datetime.strptime(param_start_date, "%Y-%m-%d %H:%M:%S.%f%z")
-    print(var_datetime)         
-    
-    sql_queries_json=functions.druid_adapter_query(param_df_druid=param_df_druid,aggregationTime="",minutos=15,var_datetime=var_datetime)
-    return sql_queries_json  
-      
-
-def execute_druid_adapter_query(**kwargs):
-    df_druid = kwargs['param_df']
-    start_date = kwargs['start_date']
-    sql_queries_json = druid_adapter_query(df_druid, start_date)
-    return(sql_queries_json)
-  
-
-# Función para ejecutar la consulta a Druid
-def execute_druid_query(**kwargs):
-    sql_queries_str = kwargs['param_sql_queries']    
-    results=functions.execute_druid_query(sql_queries_str)    
-    kwargs['ti'].xcom_push(key='response_texts', value=results)
-         
-
-def produce_message_to_topic_kafka(**kwargs):
-    response_texts = kwargs['ti'].xcom_pull(task_ids='execute_druid_query_task', key='response_texts')
-    functions.produce_message_to_topic_kafka(response_texts,900,"PT900S")
-    
-
-#Definición del Dag
-dag = DAG(
-    'dag_alarms_aggregation_spatial_15M',  # Nombre de tu DAG
-    default_args=default_args,
-    schedule_interval  ='5-59/15 * * * *',  # Se jecuta cada 15 min
-    catchup=False,
+# Definición del DAG
+@dag(
+    dag_id="dag_alarms_aggregation_spatial_15M",  
+    default_args={"owner": "CoE"},
+    #schedule_interval=None, 
+    schedule_interval='5-59/15 * * * *',
+    start_date=days_ago(1), 
+    catchup=False, 
     tags=["alarms", "aggregation"],
+    max_active_tasks = 10
 )
 
-# Definición de las tareas
-start_task = DummyOperator(
-    task_id='start',
-    dag=dag,
-)
+def dag_alarms_aggregation_spatial_15M():  
+    @task
+    def query_select_datataframe(start_date):
+        result_json = functions.postgresData("dataAggregationTimeGranularity", varGranularity)
+        df_dict = json.loads(result_json)  
+        return [{"row": row, "start_date": start_date} for row in df_dict]  
+    
+    @task(retries=1, retry_delay=timedelta(minutes=1))
+    def process_task(data):
+        row, start_date = data["row"], data["start_date"]
+        var_datetime = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S.%f%z")
+        json_data = json.dumps([row]) 
+        
+        algorithm = row["algorithm"]  
+        print("algorithm:", algorithm)
 
-query_select_datataframe_task = PythonOperator(
-    task_id='query_select_datataframe_task',
-    python_callable=query_select_datataframe,
-    dag=dag,
-)
+        #algorithmcomparisontype = row["algorithmcomparisontype"]
+        
+        #functions.prepared_data_load(json_data, var_datetime, varGranularity, varMinutes)
 
-execute_druid_adapter_query_task = PythonOperator(
-    task_id='execute_druid_adapter_query_task',
-    python_callable=execute_druid_adapter_query,
-    op_kwargs={'param_df': "{{ ti.xcom_pull(task_ids='query_select_datataframe_task')}}", 'start_date':"{{ dag_run.start_date }}"},
-    provide_context=True,
-    dag=dag,
-)
+        if algorithm == 'AVERAGE_HISTORICAL_VALUE':    
+            json_list = []
+            algorithmcomparisonvalue = float(row['algorithmcomparisonvalue'])  
+            print("algorithmcomparisonvalue:", algorithmcomparisonvalue)
 
-execute_druid_query_task = PythonOperator(
-    task_id='execute_druid_query_task',
-    python_callable=execute_druid_query,
-    op_kwargs={'param_sql_queries': "{{ ti.xcom_pull(task_ids='execute_druid_adapter_query_task')}}"},
-    provide_context=True,
-    dag=dag,
-)
+            intervaldays = int(row["intervaldays"])  
+            print("intervaldays:", intervaldays)
 
-produce_messages_to_kafka_task = PythonOperator(
-    task_id='produce_messages_to_kafka_task',
-    python_callable=produce_message_to_topic_kafka,
-    provide_context=True,
-    dag=dag,
-)
+            times = int(row["times"])  
+            print("times:", times)       
 
-data_load_control_kpi_task = PythonOperator(
-    task_id='data_load_control_kpi_task',
-    python_callable=data_load_control_kpi,    
-    op_kwargs={'start_date':"{{ dag_run.start_date }}"},
-    provide_context=True,
-    dag=dag,
-)
+            for i in range(0, max(1, times + 1)):
+                print(f"Iteración {i} - {var_datetime}")
 
-end_task = DummyOperator(
-    task_id='end',
-    dag=dag,
-)
+                sql_queries = functions.druid_adapter_query(json_data, aggregationTime="", minutos=varMinutes, var_datetime=var_datetime)
+                results = functions.execute_druid_query(sql_queries)
+                nested_json = functions.create_nested_json(results, varSeconds, varDurationIso) 
+                json_list.append(nested_json)  
 
-# Definir el orden de las tareas
-start_task >> data_load_control_kpi_task 
-data_load_control_kpi_task >> query_select_datataframe_task 
-query_select_datataframe_task >> execute_druid_adapter_query_task
-execute_druid_adapter_query_task >> execute_druid_query_task
-execute_druid_query_task >> produce_messages_to_kafka_task 
-produce_messages_to_kafka_task >> end_task
+                if i == 0:
+                    var_datetime = var_datetime - timedelta(minutes = int(algorithmcomparisonvalue)*varMinutes)                           
+                elif i > 0: 
+                    var_datetime = var_datetime - timedelta(days = intervaldays) 
+        else:
+            sql_queries = functions.druid_adapter_query(json_data, aggregationTime="", minutos=varMinutes, var_datetime=var_datetime)
+            json_list = functions.execute_druid_query(sql_queries)
+        
+        functions.produce_message_to_topic_kafka(json_list, varSeconds, varDurationIso, algorithm)
+
+        
+    # Cada fila se procesa en su flujo completo
+    start_date = "{{ dag_run.start_date }}"
+    df_rows = query_select_datataframe(start_date)
+    process_task.expand(data=df_rows)
+
+
+# Creando la instancia del DAG
+dag_instance = dag_alarms_aggregation_spatial_15M()
